@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wo ist die Katze?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chewy&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--g:#2d9b5a;--gd:#1f6f40;--gl:#e3f5ea;--y:#ffd23f;--yd:#e0b100;--yl:#fff6d1;--ink:#24312a;--red:#e05252;}
+*{box-sizing:border-box}
+body{margin:0;font-family:Nunito,sans-serif;background:var(--yl);color:var(--ink);min-height:100vh;display:flex;flex-direction:column}
+header{background:var(--g);color:#fff;padding:20px 16px 46px;text-align:center;border-radius:0 0 32px 32px}
+h1{font-family:Chewy,cursive;font-size:2.6rem;margin:0;letter-spacing:1px}
+header p{margin:6px 0 0;font-weight:700;opacity:.95}
+main{max-width:880px;width:100%;margin:0 auto;padding:0 16px 24px;flex:1}
+nav{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:-28px 0 18px}
+nav button{font-family:Chewy,cursive;font-size:1.15rem;padding:10px 18px;border:none;border-radius:999px;background:#fff;color:var(--gd);cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.12)}
+nav button.active{background:var(--y);color:var(--ink)}
+.card{background:#fff;border-radius:24px;padding:18px;box-shadow:0 5px 0 rgba(0,0,0,.07);margin-bottom:16px}
+.consigne{background:var(--gl);border-left:6px solid var(--g);padding:10px 14px;border-radius:14px;font-weight:700;margin-bottom:14px}
+.consigne small{font-weight:400}
+.scene{width:100%;max-width:500px;display:block;margin:0 auto;background:#f1faf4;border-radius:20px}
+.hud{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;font-weight:800}
+.pill{background:var(--yl);border:2px solid var(--yd);border-radius:999px;padding:4px 14px}
+.sentence{font-size:1.5rem;text-align:center;font-weight:800;margin:14px 0 4px;min-height:2.2rem}
+.gap{display:inline-block;min-width:90px;border-bottom:3px dashed var(--g);color:var(--gd);font-family:Chewy,cursive;font-size:1.7rem}
+.opts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.opt{font-family:Chewy,cursive;font-size:1.5rem;padding:12px 4px;border:3px solid var(--g);background:#fff;color:var(--gd);border-radius:18px;cursor:pointer;transition:transform .1s}
+.opt:hover{transform:translateY(-2px)}
+.opt.ok{background:var(--g);color:#fff}.opt.ko{background:var(--red);border-color:var(--red);color:#fff}
+.opt:disabled{cursor:default}
+.feedback{text-align:center;font-weight:800;min-height:1.6rem;margin-top:10px}
+.big{font-family:Chewy,cursive;font-size:1.3rem;border:none;border-radius:18px;padding:12px 26px;background:var(--g);color:#fff;cursor:pointer;box-shadow:0 4px 0 var(--gd)}
+.big.yellow{background:var(--y);color:var(--ink);box-shadow:0 4px 0 var(--yd)}
+.center{text-align:center}
+.learn{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.learn .item{background:var(--gl);border-radius:18px;padding:8px;text-align:center;cursor:pointer}
+.learn .item svg{width:100%;background:#fff;border-radius:14px}
+.learn .de{font-family:Chewy,cursive;font-size:1.6rem;color:var(--gd)}
+.learn .fr{font-size:.95rem}
+.tf{display:flex;gap:16px;justify-content:center;margin-top:14px}
+.tf button{font-size:2rem;width:120px;padding:10px;border:none;border-radius:20px;cursor:pointer;color:#fff;font-family:Chewy,cursive}
+.tf .yes{background:var(--g);box-shadow:0 5px 0 var(--gd)}.tf .no{background:var(--red);box-shadow:0 5px 0 #a63a3a}
+.timerbar{height:12px;background:#eee;border-radius:99px;overflow:hidden;margin-bottom:10px}
+.timerbar div{height:100%;background:var(--y);width:100%;transition:width 1s linear}
+.memo{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.mc{aspect-ratio:1/1;perspective:600px;cursor:pointer}
+.mc .in{position:relative;width:100%;height:100%;transition:transform .45s;transform-style:preserve-3d}
+.mc.flip .in{transform:rotateY(180deg)}
+.mc .f,.mc .b{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;display:flex;align-items:center;justify-content:center}
+.mc .f{background:var(--g);color:var(--y);font-family:Chewy,cursive;font-size:2.4rem;box-shadow:0 4px 0 var(--gd)}
+.mc .b{background:#fff;border:3px solid var(--g);transform:rotateY(180deg);padding:4px}
+.mc .b svg{width:100%;height:100%}
+.mc .b span{font-family:Chewy,cursive;font-size:1.6rem;color:var(--gd)}
+.mc.done .b{background:var(--gl);border-color:var(--y)}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:10;padding:16px}
+.overlay.show{display:flex}
+.overlay .card{max-width:420px;text-align:center}
+.stars{font-size:2.6rem;color:var(--yd);letter-spacing:6px}
+.tip{background:var(--yl);border-radius:14px;padding:10px 14px;font-size:.95rem;margin-top:12px}
+footer{text-align:center;font-size:.85rem;padding:12px;color:#6b7a70}
+@media(max-width:560px){h1{font-size:2rem}.opts{grid-template-columns:repeat(2,1fr)}.sentence{font-size:1.2rem}.mc .b span{font-size:1.1rem}.memo{gap:6px}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <defs>
+  <g id="cat">
+   <path d="M68 112 C100 110 104 78 88 66" fill="none" stroke="#333" stroke-width="10" stroke-linecap="round"/>
+   <path d="M68 112 C100 110 104 78 88 66" fill="none" stroke="#a9adb3" stroke-width="5" stroke-linecap="round"/>
+   <ellipse cx="50" cy="88" rx="26" ry="29" fill="#a9adb3" stroke="#333" stroke-width="3"/>
+   <ellipse cx="50" cy="95" rx="13" ry="19" fill="#eceef0"/>
+   <path d="M27 80 q7 2 9 9 M73 80 q-7 2 -9 9 M26 95 q7 1 9 7 M74 95 q-7 1 -9 7" stroke="#555" stroke-width="3" fill="none" stroke-linecap="round"/>
+   <ellipse cx="39" cy="116" rx="9" ry="5" fill="#a9adb3" stroke="#333" stroke-width="2.5"/>
+   <ellipse cx="61" cy="116" rx="9" ry="5" fill="#a9adb3" stroke="#333" stroke-width="2.5"/>
+   <polygon points="29,34 27,8 46,24" fill="#a9adb3" stroke="#333" stroke-width="3" stroke-linejoin="round"/>
+   <polygon points="71,34 73,8 54,24" fill="#a9adb3" stroke="#333" stroke-width="3" stroke-linejoin="round"/>
+   <polygon points="32,28 31,15 40,24" fill="#f2a7b5"/><polygon points="68,28 69,15 60,24" fill="#f2a7b5"/>
+   <circle cx="50" cy="44" r="24" fill="#a9adb3" stroke="#333" stroke-width="3"/>
+   <path d="M45 22 l2 8 M50 21 v9 M55 22 l-2 8" stroke="#555" stroke-width="2.5" stroke-linecap="round"/>
+   <ellipse cx="41" cy="42" rx="4.5" ry="5.5" fill="#1f2a24"/><ellipse cx="59" cy="42" rx="4.5" ry="5.5" fill="#1f2a24"/>
+   <circle cx="42.5" cy="40" r="1.6" fill="#fff"/><circle cx="60.5" cy="40" r="1.6" fill="#fff"/>
+   <polygon points="46.5,50 53.5,50 50,54.5" fill="#e07a8a"/>
+   <path d="M50 54.5 q-4 5 -8 2 M50 54.5 q4 5 8 2" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+   <path d="M36 52 h-14 M36 55 l-13 4 M64 52 h14 M64 55 l13 4" stroke="#333" stroke-width="1.6" stroke-linecap="round"/>
+  </g>
+ </defs>
+</svg>
+
+<header>
+ <h1>🐱 Wo ist die Katze?</h1>
+ <p>Les prépositions de lieu · auf · unter · über · vor · in · neben · hinter · an</p>
+</header>
+
+<main>
+ <nav>
+  <button data-m="learn" class="active">📖 Lernen</button>
+  <button data-m="quiz">🎯 Quiz</button>
+  <button data-m="tf">⚡ Blitz</button>
+  <button data-m="memo">🃏 Memory</button>
+ </nav>
+
+ <section id="learn" class="mode">
+  <div class="card">
+   <div class="consigne">Observe les 8 images et lis les phrases. Clique sur une image pour l'entendre. <br><small>Wo? → Dativ : die Kiste → <b>der</b> Kiste</small></div>
+   <div class="learn" id="learnGrid"></div>
+  </div>
+ </section>
+
+ <section id="quiz" class="mode" hidden>
+  <div class="card">
+   <div class="consigne">Où est le chat ? Choisis la bonne préposition. 10 questions — enchaîne les bonnes réponses pour gagner des points bonus ! 🔥</div>
+   <div class="hud"><span class="pill" id="qNum">Frage 1/10</span><span class="pill" id="qStreak">🔥 0</span><span class="pill" id="qScore">⭐ 0</span></div>
+   <div id="qScene"></div>
+   <div class="sentence" id="qSent"></div>
+   <div class="opts" id="qOpts"></div>
+   <div class="feedback" id="qFb"></div>
+   <div class="center" style="margin-top:10px"><button class="big" id="qNext" hidden>Weiter ➜</button></div>
+  </div>
+ </section>
+
+ <section id="tf" class="mode" hidden>
+  <div class="card">
+   <div class="consigne">Blitz-Runde : 60 secondes ! La phrase correspond-elle à l'image ? Réponds le plus vite possible. ✅ = richtig · ❌ = falsch</div>
+   <div id="tfStart" class="center"><button class="big yellow" id="tfGo">Los geht's! ⏱️</button></div>
+   <div id="tfGame" hidden>
+    <div class="timerbar"><div id="tfBar"></div></div>
+    <div class="hud"><span class="pill" id="tfTime">⏱️ 60</span><span class="pill" id="tfScore">⭐ 0</span></div>
+    <div id="tfScene"></div>
+    <div class="sentence" id="tfSent"></div>
+    <div class="tf"><button class="yes" id="tfYes">✔</button><button class="no" id="tfNo">✘</button></div>
+    <div class="feedback" id="tfFb"></div>
+   </div>
+  </div>
+ </section>
+
+ <section id="memo" class="mode" hidden>
+  <div class="card">
+   <div class="consigne">Memory : retourne deux cartes et retrouve chaque image avec sa préposition. Essaie de faire le moins de coups possible !</div>
+   <div class="hud"><span class="pill" id="mMoves">Züge: 0</span><span class="pill" id="mPairs">Paare: 0/8</span><button class="big yellow" id="mRestart" style="padding:6px 16px;font-size:1rem">🔄 Neu</button></div>
+   <div class="memo" id="memoGrid"></div>
+  </div>
+ </section>
+</main>
+
+<div class="overlay" id="ov"><div class="card"><div class="stars" id="ovStars"></div><h2 style="font-family:Chewy,cursive;font-size:2rem;margin:6px 0" id="ovTitle"></h2><p id="ovText" style="font-weight:700"></p><button class="big" id="ovBtn">Nochmal! 🔄</button></div></div>
+
+<footer>V. Kalinijabo · Deutsch · Präpositionen</footer>
+
+<script>
+const PREPS=[
+ {p:'auf',fr:'sur'},{p:'unter',fr:'sous'},{p:'über',fr:'au-dessus de'},{p:'vor',fr:'devant'},
+ {p:'in',fr:'dans'},{p:'neben',fr:'à côté de'},{p:'hinter',fr:'derrière'},{p:'an',fr:'contre (accroché à)'}];
+const POS={auf:[278,172,0,.75],unter:[275,338,0,.45],'über':[275,46,180,.7],vor:[232,374,0,1],
+ in:[272,228,0,.8],neben:[452,342,0,.85],hinter:[330,200,0,.72],an:[180,232,-90,.68]};
+const sent=p=>`Die Katze ist ${p} der Kiste.`;
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+
+function scene(p,cls='scene'){
+ const [x,y,r,s]=POS[p];
+ const cat=`<use href="#cat" transform="translate(${x},${y}) rotate(${r}) scale(${s}) translate(-50,-120)"/>`;
+ const st='stroke="#7a5320" stroke-width="3" stroke-linejoin="round"';
+ const legs=`<rect x="214" y="255" width="9" height="55" fill="#8a5d22"/><rect x="356" y="255" width="9" height="55" fill="#8a5d22"/><rect x="186" y="280" width="10" height="60" fill="#9c6a28" ${st}/><rect x="324" y="280" width="10" height="60" fill="#9c6a28" ${st}/>`;
+ const lid=`<polygon points="210,155 370,155 386,92 226,92" fill="#f2c879" ${st}/>`;
+ const inner=`<polygon points="180,180 210,155 370,155 340,180" fill="#6b4519" ${st}/>`;
+ const top=`<polygon points="180,180 210,155 370,155 340,180" fill="#f2c879" ${st}/>`;
+ const front=`<rect x="180" y="180" width="160" height="100" fill="#e0a94f" ${st}/><path d="M180 213 H340 M180 246 H340" stroke="#b07a2c" stroke-width="2"/>`;
+ const side=`<polygon points="340,180 370,155 370,255 340,280" fill="#c08a35" ${st}/>`;
+ const bar=`<path d="M215 0 V34 M345 0 V34" stroke="#666" stroke-width="3"/><rect x="195" y="32" width="170" height="12" rx="6" fill="#4a4a4a"/>`;
+ let b;
+ if(p==='in') b=legs+lid+inner+cat+front+side;
+ else if(p==='hinter') b=cat+legs+top+front+side;
+ else b=legs+top+front+side+cat;
+ return `<svg viewBox="0 0 520 390" class="${cls}" role="img" aria-label="Katze und Kiste"><rect y="340" width="520" height="50" fill="#cfe9d6"/>${bar}${b}</svg>`;
+}
+
+/* sons */
+let AC;function beep(f,d=.15,t='sine'){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type=t;o.frequency.value=f;o.connect(g);g.connect(AC.destination);g.gain.setValueAtTime(.15,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.start();o.stop(AC.currentTime+d)}catch(e){}}
+const good=()=>{beep(660);setTimeout(()=>beep(880),110)},bad=()=>beep(200,.25,'square');
+function say(t){try{const u=new SpeechSynthesisUtterance(t);u.lang='de-DE';u.rate=.9;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
+
+/* navigation */
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x===b));
+ document.querySelectorAll('.mode').forEach(s=>s.hidden=s.id!==b.dataset.m);
+ stopTF();
+ if(b.dataset.m==='quiz')startQuiz(); if(b.dataset.m==='memo')startMemo();
+});
+
+/* Lernen */
+document.getElementById('learnGrid').innerHTML=PREPS.map(o=>`<div class="item" data-p="${o.p}">${scene(o.p,'')}<div class="de">${o.p}</div><div class="fr">${o.fr}</div><div style="font-size:.85rem;font-weight:700">${sent(`<b>${o.p}</b>`)}</div></div>`).join('');
+document.querySelectorAll('.learn .item').forEach(i=>i.onclick=()=>say(sent(i.dataset.p)));
+
+/* Quiz */
+let Q={};
+function startQuiz(){const list=shuffle([...shuffle(PREPS.map(o=>o.p)),...shuffle(PREPS.map(o=>o.p)).slice(0,2)]);Q={list,i:0,score:0,streak:0,correct:0};showQ()}
+function showQ(){
+ const p=Q.list[Q.i];
+ qNum.textContent=`Frage ${Q.i+1}/10`;qStreak.textContent=`🔥 ${Q.streak}`;qScore.textContent=`⭐ ${Q.score}`;
+ qScene.innerHTML=scene(p);qSent.innerHTML=`Die Katze ist <span class="gap">&nbsp;?&nbsp;</span> der Kiste.`;
+ qFb.textContent='';qNext.hidden=true;
+ qOpts.innerHTML=PREPS.map(o=>`<button class="opt">${o.p}</button>`).join('');
+ qOpts.querySelectorAll('.opt').forEach(b=>b.onclick=()=>answerQ(b,p));
+}
+function answerQ(btn,p){
+ const ok=btn.textContent===p;
+ qOpts.querySelectorAll('.opt').forEach(b=>{b.disabled=true;if(b.textContent===p)b.classList.add('ok')});
+ if(ok){Q.streak++;Q.correct++;const pts=10+(Q.streak>=3?5:0);Q.score+=pts;good();qFb.innerHTML=`✅ Super! +${pts}${Q.streak>=3?' (Bonus 🔥)':''}`}
+ else{Q.streak=0;btn.classList.add('ko');bad();qFb.innerHTML=`❌ Leider nicht… Es ist <b>${p}</b> (${PREPS.find(o=>o.p===p).fr}).`}
+ qSent.innerHTML=sent(`<span class="gap">${p}</span>`);say(sent(p));
+ qStreak.textContent=`🔥 ${Q.streak}`;qScore.textContent=`⭐ ${Q.score}`;
+ qNext.hidden=false;qNext.textContent=Q.i<9?'Weiter ➜':'Ergebnis 🏆';
+}
+qNext.onclick=()=>{Q.i++;if(Q.i<10)showQ();else finish(Q.correct,10,`${Q.correct}/10 richtig · ${Q.score} Punkte`,startQuiz)};
+
+/* Blitz */
+let T={};
+tfGo.onclick=()=>{tfStart.hidden=true;tfGame.hidden=false;T={time:60,score:0};tfBar.style.width='100%';nextTF();
+ T.int=setInterval(()=>{T.time--;tfTime.textContent=`⏱️ ${T.time}`;tfBar.style.width=(T.time/60*100)+'%';if(T.time<=0){stopTF();finish(Math.min(T.score,20),20,`${T.score} richtige Antworten in 60 Sekunden!`,()=>{tfStart.hidden=false;tfGame.hidden=true})}},1000)};
+function stopTF(){clearInterval(T.int)}
+function nextTF(){
+ const p=PREPS[Math.floor(Math.random()*8)].p;const truth=Math.random()<.5;
+ const shown=truth?p:shuffle(PREPS.map(o=>o.p).filter(x=>x!==p))[0];
+ T.p=p;T.truth=truth;tfScene.innerHTML=scene(p);tfSent.innerHTML=sent(`<b style="color:var(--gd)">${shown}</b>`);
+ tfScore.textContent=`⭐ ${T.score}`;
+}
+function answerTF(v){if(!(T.time>0))return;if(v===T.truth){T.score++;good();tfFb.textContent='✅'}else{bad();tfFb.innerHTML=`❌ <b>${T.p}</b>`}nextTF()}
+tfYes.onclick=()=>answerTF(true);tfNo.onclick=()=>answerTF(false);
+
+/* Memory */
+let M={};
+function startMemo(){
+ const cards=shuffle(PREPS.flatMap(o=>[{p:o.p,t:'img'},{p:o.p,t:'word'}]));
+ M={first:null,lock:false,moves:0,pairs:0};mMoves.textContent='Züge: 0';mPairs.textContent='Paare: 0/8';
+ memoGrid.innerHTML=cards.map(c=>`<div class="mc" data-p="${c.p}"><div class="in"><div class="f">?</div><div class="b">${c.t==='img'?scene(c.p,''):`<span>${c.p}</span>`}</div></div></div>`).join('');
+ memoGrid.querySelectorAll('.mc').forEach(c=>c.onclick=()=>flip(c));
+}
+function flip(c){
+ if(M.lock||c.classList.contains('flip'))return;c.classList.add('flip');beep(500,.06);
+ if(!M.first){M.first=c;return}
+ M.moves++;mMoves.textContent=`Züge: ${M.moves}`;const a=M.first;M.first=null;
+ if(a.dataset.p===c.dataset.p){a.classList.add('done');c.classList.add('done');M.pairs++;good();say(sent(c.dataset.p));mPairs.textContent=`Paare: ${M.pairs}/8`;
+  if(M.pairs===8)setTimeout(()=>finish(Math.max(0,24-M.moves),16,`Geschafft in ${M.moves} Zügen!`,startMemo),700)}
+ else{M.lock=true;setTimeout(()=>{a.classList.remove('flip');c.classList.remove('flip');M.lock=false},900)}
+}
+mRestart.onclick=startMemo;
+
+/* Résultat */
+function finish(score,max,text,again){
+ const r=score/max,n=r>=.9?3:r>=.6?2:r>=.3?1:0;
+ ovStars.textContent='★'.repeat(n)+'☆'.repeat(3-n);
+ ovTitle.textContent=['Weiter üben! 💪','Gut gemacht! 👍','Sehr gut! 🎉','Fantastisch! 🏆'][n];
+ ovText.textContent=text;ov.classList.add('show');if(n>=2){good();setTimeout(good,250)}
+ ovBtn.onclick=()=>{ov.classList.remove('show');again()};
+}
+</script>
+</body>
+</html>
